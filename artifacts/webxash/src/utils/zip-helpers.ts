@@ -1,8 +1,27 @@
 const isZipBuffer = (buffer: ArrayBuffer): boolean => {
   if (!buffer || buffer.byteLength < 4) return false;
   const bytes = new Uint8Array(buffer, 0, 4);
-  // Zip files start with PK\x03\x04 or PK\x05\x06 or PK\x07\x08
-  return bytes[0] === 0x50 && bytes[1] === 0x4b;
+  // A valid archive must have a local-file signature and an end-of-central-directory
+  // record. Checking both prevents an HTML response or a truncated/malformed ZIP
+  // from reaching fflate, where it otherwise surfaces as an opaque Infinity error.
+  const hasLocalFileSignature =
+    bytes[0] === 0x50 && bytes[1] === 0x4b && bytes[2] === 0x03 && bytes[3] === 0x04;
+  if (!hasLocalFileSignature) return false;
+
+  const view = new Uint8Array(buffer);
+  const minimumEndRecordLength = 22;
+  const searchStart = Math.max(0, view.length - 0xffff - minimumEndRecordLength);
+  for (let index = view.length - minimumEndRecordLength; index >= searchStart; index -= 1) {
+    if (
+      view[index] === 0x50 &&
+      view[index + 1] === 0x4b &&
+      view[index + 2] === 0x05 &&
+      view[index + 3] === 0x06
+    ) {
+      return true;
+    }
+  }
+  return false;
 };
 
 const fetchZipWithFetch = async (

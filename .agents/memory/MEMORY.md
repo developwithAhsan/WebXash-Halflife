@@ -1,1 +1,2 @@
 - [Artifact workflow ports](artifact-workflow-ports.md) — web previews depend on Vite honoring the workflow-provided port.
+- [ZIP archive validation](zip-archive-validation.md) — validate archive structure before passing game assets to the WASM decompressor.
