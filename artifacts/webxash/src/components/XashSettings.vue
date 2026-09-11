@@ -85,15 +85,34 @@
           <p>Choose a game, point us to its files, then launch. Your last choices are remembered on this device.</p>
         </div>
 
+        <div class="quick-actions" aria-label="Launcher quick actions">
+          <button class="quick-action quick-action--play" type="button" @click="startUplink">
+            <span class="quick-action-icon quick-action-icon--play" aria-hidden="true"><span class="button-play"></span></span>
+            <span><small>01 / Start here</small><strong>Play Uplink</strong><em>Launch the included demo</em></span>
+          </button>
+          <button class="quick-action" type="button" @click="scrollToSection('save-manager')">
+            <span class="quick-action-icon" aria-hidden="true">▣</span>
+            <span><small>02</small><strong>Save manager</strong><em>Back up local saves</em></span>
+          </button>
+          <button class="quick-action" type="button" @click="scrollToSection('multiplayer')">
+            <span class="quick-action-icon" aria-hidden="true">↗</span>
+            <span><small>03</small><strong>Multiplayer</strong><em>Connect a server</em></span>
+          </button>
+          <button class="quick-action" type="button" @click="scrollToSection('session-options')">
+            <span class="quick-action-icon" aria-hidden="true">⌘</span>
+            <span><small>04</small><strong>Options</strong><em>FPS, fullscreen and more</em></span>
+          </button>
+        </div>
+
         <div class="launcher-layout">
           <aside class="launcher-sidebar">
             <div class="panel panel--game">
               <div class="panel-label"><span>01</span> Choose a game</div>
               <XashGames />
             </div>
-            <div class="panel panel--source">
+            <div id="game-files" class="panel panel--source">
               <div class="panel-label"><span>02</span> Add game files</div>
-              <p class="panel-help">Use a local game folder or a ZIP archive. WebXash reads them in place.</p>
+              <p class="panel-help">Use your own licensed game folder or ZIP archive. Files stay in this browser and are never uploaded.</p>
               <div class="source-card"><XashLoadDirectory /></div>
               <div class="source-divider"><span>or</span></div>
               <div class="source-card"><XashLoadZip /></div>
@@ -115,12 +134,12 @@
               <span class="session-path">{{ selectedGame.publicDir }}</span>
             </div>
 
-            <div class="panel panel--options">
+            <div id="session-options" class="panel panel--options">
               <div class="panel-label"><span>03</span> Tune your session</div>
               <p class="panel-help">These options apply the next time you launch. Keep the defaults for a clean first run.</p>
               <div class="options-grid">
                 <div class="option-block"><XashLaunchOptions /></div>
-                <div class="option-block option-block--network">
+                <div id="multiplayer" class="option-block option-block--network">
                   <div class="mini-label">Multiplayer server</div>
                   <p>Optional address for a compatible GoldSrc server.</p>
                   <XashMultiplayerIP />
@@ -128,7 +147,7 @@
               </div>
             </div>
 
-            <div class="panel panel--saves">
+            <div id="save-manager" class="panel panel--saves">
               <div class="panel-label"><span>04</span> Your saves</div>
               <p class="panel-help">Browser saves are stored locally. Add a save file or download a backup anytime.</p>
               <div class="save-manager"><XashSaves /></div>
@@ -253,6 +272,7 @@ const filteredFaqs = computed(() => faqData.filter((item) => (selectedFaqCategor
 const areAllFaqsOpen = computed(() => filteredFaqs.value.length > 0 && filteredFaqs.value.every((item) => openFaqMap.value[item.id]));
 const toggleFaq = (id: string) => { openFaqMap.value[id] = !openFaqMap.value[id]; };
 const toggleExpandAll = () => { const open = !areAllFaqsOpen.value; filteredFaqs.value.forEach((item) => { openFaqMap.value[item.id] = open; }); };
+const scrollToSection = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 const disqusLoaded = ref(false);
 const loadDisqus = () => {
@@ -390,6 +410,18 @@ h1 em { color: var(--amber-400); font-style: normal; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 30px; }
 .section-heading h2 { margin-top: 15px; color: var(--fog-100); font-size: clamp(30px, 4vw, 50px); font-weight: 600; letter-spacing: -.045em; }
 .section-heading > p { max-width: 360px; color: var(--fog-500); font-size: 13px; line-height: 1.6; }
+.quick-actions { display: grid; grid-template-columns: 1.25fr repeat(3, 1fr); gap: 10px; margin: -4px 0 18px; }
+.quick-action { display: flex; align-items: center; gap: 12px; min-height: 78px; padding: 14px; color: var(--fog-100); text-align: left; cursor: pointer; background: rgba(18, 33, 37, .68); border: 1px solid var(--line); border-radius: 9px; transition: transform .18s ease, border-color .18s ease, background-color .18s ease; }
+.quick-action:hover { transform: translateY(-3px); border-color: rgba(243, 181, 72, .48); background: rgba(35, 56, 60, .86); }
+.quick-action--play { color: var(--ink-950); background: var(--amber-400); border-color: var(--amber-400); }
+.quick-action--play:hover { background: #ffd071; border-color: #ffd071; }
+.quick-action-icon { display: grid; flex: 0 0 34px; place-items: center; width: 34px; height: 34px; color: var(--amber-400); border: 1px solid rgba(243, 181, 72, .35); border-radius: 7px; font: 700 16px/1 'DM Mono', monospace; }
+.quick-action--play .quick-action-icon { color: var(--ink-950); border-color: rgba(9, 16, 19, .25); }
+.quick-action span:last-child { display: grid; gap: 4px; }
+.quick-action small, .quick-action em { font: 500 9px/1 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; opacity: .72; }
+.quick-action em { font-size: 10px; font-style: normal; letter-spacing: 0; text-transform: none; opacity: .68; }
+.quick-action strong { font-size: 14px; font-weight: 650; }
+.quick-action--play small, .quick-action--play em { color: rgba(9, 16, 19, .7); }
 .launcher-layout { display: grid; grid-template-columns: minmax(265px, .72fr) minmax(0, 1.55fr); gap: 18px; align-items: start; }
 .launcher-sidebar, .launcher-main { display: grid; gap: 14px; }
 .panel { padding: 20px; background: rgba(17, 32, 35, .68); border: 1px solid var(--line); border-radius: 9px; }
@@ -413,6 +445,7 @@ h1 em { color: var(--amber-400); font-style: normal; }
 .launch-strip-kicker { display: block; margin-bottom: 7px; color: var(--amber-400); }
 .launch-strip strong { color: var(--fog-100); font-size: 14px; font-weight: 500; }
 .button--launch { min-width: 168px; }
+#game-files, #session-options, #multiplayer, #save-manager { scroll-margin-top: 100px; }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: var(--line); }
 .step-card { min-height: 210px; padding: 26px; background: rgba(17, 32, 35, .78); }
 .step-number { color: var(--amber-400); font: 500 11px/1 'DM Mono', monospace; }
@@ -506,10 +539,10 @@ h1 em { text-shadow: 0 0 42px rgba(246, 185, 79, .14); }
 @keyframes ambientFloat { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(18px, 24px, 0); } }
 
 @media (max-width: 920px) {
-  .site-header { padding-inline: 22px; }.site-nav { display: none; }.app-content { padding-inline: 22px; }.hero { grid-template-columns: 1fr; gap: 45px; min-height: auto; }.hero-visual { max-width: 600px; width: 100%; }.launcher-layout { grid-template-columns: 1fr; }.launcher-sidebar { grid-template-columns: repeat(2, 1fr); align-items: start; }.panel--game, .panel--demos { grid-column: span 1; }.panel--source { grid-column: span 2; }.site-footer { grid-template-columns: 1fr 1fr; padding-inline: 22px; }.footer-links { justify-content: start; grid-column: span 2; }
+  .site-header { padding-inline: 22px; }.site-nav { display: none; }.app-content { padding-inline: 22px; }.hero { grid-template-columns: 1fr; gap: 45px; min-height: auto; }.hero-visual { max-width: 600px; width: 100%; }.quick-actions { grid-template-columns: repeat(2, 1fr); }.launcher-layout { grid-template-columns: 1fr; }.launcher-sidebar { grid-template-columns: repeat(2, 1fr); align-items: start; }.panel--game, .panel--demos { grid-column: span 1; }.panel--source { grid-column: span 2; }.site-footer { grid-template-columns: 1fr 1fr; padding-inline: 22px; }.footer-links { justify-content: start; grid-column: span 2; }
 }
 @media (max-width: 620px) {
-  .site-header { padding: 14px 17px; }.engine-state, .header-icon-button { display: none; }.header-actions { margin-left: auto; }.header-launch { padding: 10px 12px; }.app-content { padding: 52px 17px 72px; }.hero { gap: 33px; }.hero-lead { font-size: 15px; }.hero-visual { min-height: 350px; }.lambda-visual { min-height: 230px; }.lambda-visual img { width: 220px; height: 220px; }.lambda-visual span { font-size: 150px; }.section-heading { display: block; }.section-heading > p { margin-top: 16px; }.launcher-section, .how-section, .faq-section, .community-section { margin-top: 82px; }.launcher-sidebar { display: grid; grid-template-columns: 1fr; }.panel--source { grid-column: auto; }.options-grid, .steps { grid-template-columns: 1fr; }.option-block--network { padding: 20px 0 0; border-top: 1px solid var(--line); border-left: 0; }.launch-strip { display: block; }.button--launch { width: 100%; margin-top: 17px; }.faq-tools { display: block; }.faq-search { display: block; margin: 12px 0 0; }.faq-search input { width: 100%; }.section-heading--compact .text-button { margin-top: 15px; }.site-footer { grid-template-columns: 1fr; padding: 24px 17px 35px; }.footer-links { grid-column: auto; flex-wrap: wrap; }.footer-links a { padding-left: 0; }
+  .site-header { padding: 14px 17px; }.engine-state, .header-icon-button { display: none; }.header-actions { margin-left: auto; }.header-launch { padding: 10px 12px; }.app-content { padding: 52px 17px 72px; }.hero { gap: 33px; }.hero-lead { font-size: 15px; }.hero-visual { min-height: 350px; }.lambda-visual { min-height: 230px; }.lambda-visual img { width: 220px; height: 220px; }.lambda-visual span { font-size: 150px; }.section-heading { display: block; }.section-heading > p { margin-top: 16px; }.launcher-section, .how-section, .faq-section, .community-section { margin-top: 82px; }.quick-actions { grid-template-columns: 1fr; }.quick-action--play { min-height: 84px; }.launcher-sidebar { display: grid; grid-template-columns: 1fr; }.panel--source { grid-column: auto; }.options-grid, .steps { grid-template-columns: 1fr; }.option-block--network { padding: 20px 0 0; border-top: 1px solid var(--line); border-left: 0; }.launch-strip { display: block; }.button--launch { width: 100%; margin-top: 17px; }.faq-tools { display: block; }.faq-search { display: block; margin: 12px 0 0; }.faq-search input { width: 100%; }.section-heading--compact .text-button { margin-top: 15px; }.site-footer { grid-template-columns: 1fr; padding: 24px 17px 35px; }.footer-links { grid-column: auto; flex-wrap: wrap; }.footer-links a { padding-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
