@@ -1,0 +1,33 @@
+{
+  "name": "@workspace/webxash",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "node scripts/prepare-assets.js && vite build",
+    "serve": "vite preview --host 0.0.0.0",
+    "postinstall": "node scripts/prepare-assets.js",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "cs16-client": "0.1.2",
+    "fflate": "0.8.2",
+    "gh-pages": "^6.3.0",
+    "hlsdk-portable": "0.1.2",
+    "idb-keyval": "6.2.2",
+    "pinia": "3.0.3",
+    "pinia-plugin-persistedstate": "^4.4.1",
+    "vue": "3.5.13",
+    "xash3d-fwgs": "1.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.30",
+    "@vitejs/plugin-vue": "5.2.3",
+    "prettier": "3.5.1",
+    "sass-embedded": "1.81.0",
+    "typescript": "5.8.3",
+    "vite": "8.2.1",
+    "vue-tsc": "2.2.8"
+  }
+}

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "WebXash"
+description = "A polished browser launcher for Half-Life and Counter-Strike that helps players load their own game files, configure launch options, and start playing with a fast, clear experience."
+version = "1.0.0"
+id = "artifacts/webxash"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18131
+
+[services.development]
+run = "pnpm --filter @workspace/webxash run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/webxash", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/webxash/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18131"
+BASE_PATH = "/"

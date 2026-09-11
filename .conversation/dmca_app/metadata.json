@@ -1,0 +1,6 @@
+{
+  "name": "WebXash",
+  "description": "Play the original Half-Life instantly in your browser. No install, no Steam required — just click and play free online right now.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

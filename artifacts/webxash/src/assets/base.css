@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  font-family: 'Space Grotesk', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --ink-950: #091013;
+  --ink-900: #0d171a;
+  --ink-850: #122125;
+  --ink-800: #17282d;
+  --ink-700: #23383c;
+  --fog-100: #eef1e9;
+  --fog-300: #bec8bd;
+  --fog-500: #84938d;
+  --amber-400: #f3b548;
+  --amber-500: #e69a2e;
+  --amber-700: #9c5d22;
+  --lime-400: #b7d66a;
+  --cyan-400: #78c5bf;
+  --red-400: #e17b61;
+  --line: rgba(191, 211, 197, .14);
+  --line-strong: rgba(243, 181, 72, .34);
+  --shadow: 0 24px 70px rgba(0, 0, 0, .32);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  scroll-behavior: smooth;
+  background: var(--ink-950);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--ink-950);
+  color: var(--fog-100);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--amber-400);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--ink-950);
+  background: var(--amber-400);
+}

@@ -1,6 +1,6 @@
-# [Project name]
+# WebXash
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+WebXash is a browser-based Half-Life and Counter-Strike launcher that runs the open-source GoldSrc-compatible engine locally with game files supplied by the player.
 
 ## Run & Operate
 
@@ -22,15 +22,20 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/webxash/src/components/XashSettings.vue` — launcher experience, onboarding copy, and public-facing controls
+- `artifacts/webxash/src/services/xash-loader.ts` — WebAssembly engine initialization and local file/ZIP loading
+- `artifacts/webxash/src/assets/base.css` and `artifacts/webxash/src/assets/main.css` — shared launcher visual system and engine panel styling
+- `artifacts/webxash/public/hl/uplink.zip` — included Uplink demo archive used for a no-install first run
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The launcher stays local-first: commercial game files are selected from the player's device and are not uploaded.
+- The engine continues to use Xash3D FWGS WebAssembly and the existing Pinia state store.
+- The main page is a guided launcher rather than an admin-style control panel; technical options remain available but are secondary to getting a game running.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Players can choose Half-Life or Counter-Strike files from a folder or ZIP, launch the included Uplink demo, configure launch arguments, connect to compatible multiplayer servers, and manage local browser saves.
 
 ## User preferences
 
@@ -38,7 +43,8 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The web artifact must honor the workflow-provided `PORT`; hardcoding a Vite port makes the preview proxy unreachable.
+- The included demo archive must be a valid ZIP containing a `valve/` directory or the first-run launch cannot initialize the engine.
 
 ## Pointers
 
