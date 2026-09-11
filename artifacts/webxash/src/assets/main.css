@@ -1,6 +1,6 @@
 @import "./base.css";
 
-/* WebXash / "field console" visual system */
+/* WebXash / cinematic field console visual system */
 main { position: relative; }
 
 #app {
@@ -26,6 +26,15 @@ main { position: relative; }
   opacity: 1;
   pointer-events: auto;
   z-index: 80;
+}
+
+/* The engine stays untouched; this only gives its canvas a clean hand-off. */
+#canvas.loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, transparent 35%, rgba(8, 13, 16, .34));
 }
 
 /* Legacy engine panels, deliberately restyled rather than removed. */
@@ -122,6 +131,15 @@ main { position: relative; }
   height: 16px;
   margin: 0;
   accent-color: var(--amber-500);
+}
+
+.window select {
+  min-height: 40px;
+  padding: 9px 12px;
+  color: var(--fog-100);
+  background: rgba(5, 12, 14, .65);
+  border: 1px solid var(--line);
+  border-radius: 7px;
 }
 
 /* Game selector */

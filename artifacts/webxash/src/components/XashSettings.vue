@@ -22,9 +22,9 @@
         <button class="header-icon-button" type="button" aria-label="Toggle fullscreen" title="Toggle fullscreen" @click="toggleFullscreen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
         </button>
-        <button class="header-launch" type="button" @click="scrollToSetup">
+         <button class="header-launch" type="button" @click="startUplink">
           <span class="button-play" aria-hidden="true"></span>
-          Launch
+           Play Uplink
         </button>
       </div>
     </header>
@@ -33,30 +33,38 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
           <div class="eyebrow"><span class="eyebrow-rule"></span> Personal game launcher / 01</div>
-          <h1 id="hero-title">Your games.<br /><em>Your browser.</em></h1>
+           <h1 id="hero-title">The signal is live.<br /><em>Press play.</em></h1>
           <p class="hero-lead">
-            Bring the game files you already own. WebXash loads them locally, starts the
-            GoldSrc engine, and gets you into the action without an installer or an account.
+            A tiny doorway back to the worlds that started it all. Play the included Uplink
+            demo instantly, or bring the game files you already own and keep the whole session
+            on your device.
           </p>
           <div class="hero-actions">
-            <button class="button button--primary" type="button" @click="scrollToSetup">
+            <button class="button button--primary button--hero-play" type="button" @click="startUplink">
               <span class="button-play" aria-hidden="true"></span>
-              Set up a game
+              Play Uplink now
             </button>
-            <button class="button button--quiet" type="button" @click="startUplink">
-              Try the Uplink demo <span aria-hidden="true">↗</span>
+            <button class="button button--quiet" type="button" @click="scrollToSetup">
+              Bring your own files <span aria-hidden="true">↘</span>
             </button>
           </div>
           <div class="ownership-note">
             <span class="note-icon" aria-hidden="true">✓</span>
-            <span><strong>You bring the files.</strong> They stay in your browser and are never uploaded.</span>
+            <span><strong>Local by design.</strong> Uplink is included; your licensed files never leave this browser.</span>
           </div>
         </div>
-        <div class="hero-visual" aria-label="WebXash engine status">
+        <div class="hero-visual" aria-label="WebXash engine status and game atmosphere">
+          <div class="hero-image" aria-hidden="true"></div>
+          <div class="hero-image-shade" aria-hidden="true"></div>
           <div class="visual-topline"><span>LOCAL SESSION</span><span>WX / 64</span></div>
           <div class="lambda-visual" aria-hidden="true">
             <img :src="hlGlyph" alt="" />
             <span>λ</span>
+          </div>
+          <div class="visual-caption">
+            <span class="visual-caption-kicker">Included / uplink</span>
+            <strong>A signal from Black Mesa.</strong>
+            <small>No installer. No account. Just press play.</small>
           </div>
           <div class="visual-readout">
             <div><span>RENDERER</span><strong>WebGL 2</strong></div>
@@ -91,7 +99,8 @@
               <div class="source-card"><XashLoadZip /></div>
             </div>
             <div class="panel panel--demos">
-              <div class="panel-label"><span>Quick start</span> Included demo</div>
+              <div class="panel-label"><span>Quick start</span> Included Uplink demo</div>
+              <p class="demo-note">The fastest way in. This playable demo is ready before you choose a file.</p>
               <div class="source-card"><XashZips /></div>
             </div>
           </aside>
@@ -132,7 +141,7 @@
               </div>
               <button class="button button--primary button--launch" type="button" @click="startUplink">
                 <span class="button-play" aria-hidden="true"></span>
-                Launch WebXash
+                Start the Uplink demo
               </button>
             </div>
           </div>
@@ -148,9 +157,9 @@
           <p>WebXash is a browser front-end for the engine. It does not include commercial game data.</p>
         </div>
         <div class="steps">
-          <article class="step-card"><span class="step-number">01</span><h3>Bring your copy</h3><p>Use an installed Half-Life or Counter-Strike folder, or select a compatible ZIP from your device.</p></article>
-          <article class="step-card"><span class="step-number">02</span><h3>We prepare the engine</h3><p>Files are unpacked into browser storage and the open-source Xash3D engine initializes locally.</p></article>
-          <article class="step-card"><span class="step-number">03</span><h3>Play and come back</h3><p>Your settings and browser saves are ready the next time you open WebXash on this device.</p></article>
+          <article class="step-card step-card--copy"><span class="step-number">01</span><h3>Bring your copy</h3><p>Use an installed Half-Life or Counter-Strike folder, or select a compatible ZIP from your device.</p></article>
+          <article class="step-card step-card--engine"><span class="step-number">02</span><h3>We prepare the engine</h3><p>Files are unpacked into browser storage and the open-source Xash3D engine initializes locally.</p></article>
+          <article class="step-card step-card--return"><span class="step-number">03</span><h3>Play and come back</h3><p>Your settings and browser saves are ready the next time you open WebXash on this device.</p></article>
         </div>
       </section>
 
@@ -436,6 +445,66 @@ h1 em { color: var(--amber-400); font-style: normal; }
 .toast { position: fixed; right: 24px; bottom: 24px; z-index: 100; padding: 13px 17px; color: var(--ink-950); background: var(--lime-400); border-radius: 6px; box-shadow: var(--shadow); font: 500 11px/1.2 'DM Mono', monospace; }
 .toast-enter-active, .toast-leave-active { transition: opacity .2s ease, transform .2s ease; }.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(8px); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Cinematic landing layer: atmosphere around the existing launcher controls. */
+.app-shell { background: radial-gradient(circle at 50% -20%, rgba(46, 91, 91, .22), transparent 42rem), var(--ink-950); }
+.app-shell::after { position: fixed; inset: 0; content: ""; z-index: 1; pointer-events: none; opacity: .18; background-image: url("/game-lab.jpg"); background-size: 900px; background-position: 90% 15%; mix-blend-mode: screen; mask-image: linear-gradient(to bottom, rgba(0,0,0,.7), transparent 38%); }
+.ambient--one { animation: ambientFloat 18s ease-in-out infinite alternate; }
+.ambient--two { animation: ambientFloat 24s ease-in-out -6s infinite alternate-reverse; }
+.site-header { max-width: none; padding-inline: max(38px, calc((100vw - 1320px) / 2)); }
+.brand-mark { border-radius: 11px 4px 11px 4px; }
+.brand-copy strong { font-size: 15px; letter-spacing: .19em; }
+.header-launch { box-shadow: 0 8px 24px rgba(246, 185, 79, .12); }
+.hero { min-height: 630px; }
+.hero-copy { position: relative; z-index: 2; }
+.hero-copy::before { position: absolute; top: -105px; left: -80px; width: 320px; height: 320px; content: ""; pointer-events: none; background: radial-gradient(circle, rgba(246, 185, 79, .09), transparent 68%); }
+h1 { font-size: clamp(57px, 8vw, 116px); line-height: .86; letter-spacing: -.078em; }
+h1 em { text-shadow: 0 0 42px rgba(246, 185, 79, .14); }
+.hero-lead { max-width: 590px; font-size: 18px; }
+.hero-actions { margin-top: 38px; }
+.button--hero-play { min-width: 168px; padding-block: 16px; box-shadow: 0 15px 32px rgba(246, 185, 79, .12); }
+.hero-visual { min-height: 500px; isolation: isolate; border-color: rgba(112, 206, 197, .27); box-shadow: 0 30px 90px rgba(0, 0, 0, .43), inset 0 0 0 1px rgba(246, 185, 79, .07); }
+.hero-image, .hero-image-shade { position: absolute; inset: 0; pointer-events: none; }
+.hero-image { z-index: -2; background: url("/game-hero.jpg") center 46% / cover no-repeat; opacity: .73; transform: scale(1.07); animation: heroDrift 18s ease-in-out infinite alternate; }
+.hero-image-shade { z-index: -1; background: linear-gradient(180deg, rgba(8, 13, 16, .4), rgba(8, 13, 16, .22) 40%, rgba(8, 13, 16, .9)), linear-gradient(90deg, rgba(8, 13, 16, .85), transparent 68%); }
+.hero-visual::before { z-index: 0; opacity: .32; background: radial-gradient(circle at 54% 52%, rgba(246, 185, 79, .32), transparent 37%); }
+.visual-topline { color: rgba(242, 240, 232, .58); }
+.lambda-visual { min-height: 304px; }
+.lambda-visual img { opacity: .3; filter: sepia(1) saturate(2.3) hue-rotate(346deg) drop-shadow(0 0 18px rgba(246, 185, 79, .32)); }
+.lambda-visual span { font-size: 210px; text-shadow: 0 0 75px rgba(246, 185, 79, .36); }
+.visual-caption { position: relative; z-index: 1; display: grid; gap: 8px; max-width: 290px; margin: -2px 0 22px; }
+.visual-caption-kicker { color: var(--amber-400); font: 500 10px/1 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+.visual-caption strong { color: var(--fog-100); font-size: 24px; line-height: 1.04; letter-spacing: -.04em; }
+.visual-caption small { color: var(--fog-300); font-size: 12px; }
+.visual-readout { padding-top: 16px; background: linear-gradient(180deg, rgba(8, 13, 16, .08), rgba(8, 13, 16, .3)); }
+.launcher-section, .how-section, .faq-section, .community-section { margin-top: 155px; }
+.section-heading h2 { font-size: clamp(34px, 4.8vw, 58px); }
+.section-heading > p { max-width: 410px; font-size: 14px; }
+.panel { background: rgba(18, 35, 39, .74); box-shadow: 0 16px 42px rgba(0, 0, 0, .12); }
+.panel--game { background: linear-gradient(145deg, rgba(42, 67, 65, .82), rgba(18, 35, 39, .78)); }
+.panel--demos { background: linear-gradient(145deg, rgba(39, 54, 45, .72), rgba(18, 35, 39, .8)); border-color: rgba(180, 212, 124, .22); }
+.demo-note { margin: -5px 0 14px; color: var(--fog-500); font-size: 12px; line-height: 1.5; }
+.session-banner { box-shadow: inset 0 0 0 1px rgba(180, 212, 124, .04); }
+.launch-strip { box-shadow: 0 16px 40px rgba(246, 185, 79, .05); }
+.steps { border-color: rgba(195, 218, 203, .16); }
+.step-card { position: relative; min-height: 270px; overflow: hidden; background-color: rgba(17, 32, 35, .82); isolation: isolate; }
+.step-card::before { position: absolute; inset: 0; content: ""; z-index: -2; background-position: center; background-size: cover; opacity: .28; transition: opacity .3s ease, transform .6s ease; }
+.step-card::after { position: absolute; inset: 0; content: ""; z-index: -1; background: linear-gradient(180deg, rgba(8, 13, 16, .42), rgba(8, 13, 16, .95) 74%); }
+.step-card--copy::before { background-image: url("/game-frontier.jpg"); }
+.step-card--engine::before { background-image: url("/game-lab.jpg"); }
+.step-card--return::before { background-image: url("/game-hero.jpg"); }
+.step-card:hover::before { opacity: .48; transform: scale(1.05); }
+.step-card h3, .step-card p, .step-number { position: relative; z-index: 1; }
+.step-card h3 { margin-top: 68px; font-size: 23px; }
+.step-card p { max-width: 275px; }
+.faq-section, .community-section { position: relative; }
+.faq-section::before, .community-section::before { position: absolute; top: -90px; right: -13%; width: 360px; height: 360px; content: ""; pointer-events: none; border-radius: 50%; background: radial-gradient(circle, rgba(112, 206, 197, .08), transparent 68%); }
+.community-card { background: linear-gradient(135deg, rgba(18, 35, 39, .86), rgba(11, 23, 26, .74)); }
+.site-footer { max-width: none; padding-inline: max(38px, calc((100vw - 1244px) / 2)); }
+
+@keyframes heroDrift { from { transform: scale(1.07) translate3d(-1%, -1%, 0); } to { transform: scale(1.13) translate3d(1%, 1%, 0); } }
+@keyframes ambientFloat { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(18px, 24px, 0); } }
+
 @media (max-width: 920px) {
   .site-header { padding-inline: 22px; }.site-nav { display: none; }.app-content { padding-inline: 22px; }.hero { grid-template-columns: 1fr; gap: 45px; min-height: auto; }.hero-visual { max-width: 600px; width: 100%; }.launcher-layout { grid-template-columns: 1fr; }.launcher-sidebar { grid-template-columns: repeat(2, 1fr); align-items: start; }.panel--game, .panel--demos { grid-column: span 1; }.panel--source { grid-column: span 2; }.site-footer { grid-template-columns: 1fr 1fr; padding-inline: 22px; }.footer-links { justify-content: start; grid-column: span 2; }
 }

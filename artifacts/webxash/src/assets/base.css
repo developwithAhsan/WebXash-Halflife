@@ -1,27 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
   color-scheme: dark;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink-950: #091013;
+  --ink-950: #080d10;
   --ink-900: #0d171a;
-  --ink-850: #122125;
-  --ink-800: #17282d;
-  --ink-700: #23383c;
-  --fog-100: #eef1e9;
-  --fog-300: #bec8bd;
-  --fog-500: #84938d;
-  --amber-400: #f3b548;
-  --amber-500: #e69a2e;
-  --amber-700: #9c5d22;
-  --lime-400: #b7d66a;
-  --cyan-400: #78c5bf;
-  --red-400: #e17b61;
-  --line: rgba(191, 211, 197, .14);
-  --line-strong: rgba(243, 181, 72, .34);
-  --shadow: 0 24px 70px rgba(0, 0, 0, .32);
+  --ink-850: #122327;
+  --ink-800: #172d31;
+  --ink-700: #234247;
+  --fog-100: #f2f0e8;
+  --fog-300: #c8d1c7;
+  --fog-500: #81958f;
+  --amber-400: #f6b94f;
+  --amber-500: #dd8d2b;
+  --amber-700: #8f4e25;
+  --lime-400: #b4d47c;
+  --cyan-400: #70cec5;
+  --red-400: #e8755f;
+  --line: rgba(195, 218, 203, .14);
+  --line-strong: rgba(246, 185, 79, .38);
+  --shadow: 0 28px 90px rgba(0, 0, 0, .42);
 }
 
 *,
@@ -42,7 +42,9 @@ body {
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
-  background: var(--ink-950);
+  background:
+    radial-gradient(circle at 78% -10%, rgba(55, 111, 108, .18), transparent 35rem),
+    var(--ink-950);
   color: var(--fog-100);
 }
 
