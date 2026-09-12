@@ -31,6 +31,15 @@
 
     <main v-if="!loading" class="app-content">
       <div class="launcher-menu launcher-menu--top" aria-label="Launcher menu">
+        <div class="launcher-menu__background" aria-hidden="true">
+          <div
+            v-for="(image, index) in actionPanelImages"
+            :key="image"
+            class="launcher-menu__background-image"
+            :class="{ 'launcher-menu__background-image--active': activeActionPanelImage === index }"
+            :style="{ backgroundImage: `url('${image}')` }"
+          ></div>
+        </div>
         <div class="launcher-menu__title">
           <span>Choose an action</span>
           <small>Browser game launcher</small>
@@ -113,15 +122,7 @@
           </div>
         </div>
         <div class="hero-visual" aria-label="Engine status and game atmosphere">
-          <div class="hero-image-stack" aria-hidden="true">
-            <div
-              v-for="(image, index) in heroImages"
-              :key="image"
-              class="hero-image"
-              :class="{ 'hero-image--active': activeHeroImage === index }"
-              :style="{ backgroundImage: `url('${image}')` }"
-            ></div>
-          </div>
+          <div class="hero-image" aria-hidden="true"></div>
           <div class="hero-image-shade" aria-hidden="true"></div>
           <div class="visual-topline"><span>LOCAL SESSION</span><span>WX / 64</span></div>
           <div class="lambda-visual" aria-hidden="true">
@@ -306,9 +307,9 @@ const closePanel = () => { activePanel.value = 'none'; };
 const handlePanelKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && activePanel.value !== 'none') closePanel();
 };
-const heroImages = ['/scene-01.jpeg', '/scene-02.jpeg', '/scene-03.jpeg', '/scene-04.png'];
-const activeHeroImage = ref(0);
-let heroImageTimer: number | null = null;
+const actionPanelImages = ['/scene-01.jpeg', '/scene-02.jpeg', '/scene-03.jpeg'];
+const activeActionPanelImage = ref(0);
+let actionPanelImageTimer: number | null = null;
 
 const faqCategories = ['All', 'How to Play', 'Multiplayer', 'Emulation & Tech', 'Android & Devices'];
 const selectedFaqCategory = ref('All');
@@ -396,8 +397,8 @@ onMounted(() => {
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   window.scrollTo(0, 0);
   window.addEventListener('keydown', handlePanelKeydown);
-  heroImageTimer = window.setInterval(() => {
-    activeHeroImage.value = (activeHeroImage.value + 1) % heroImages.length;
+  actionPanelImageTimer = window.setInterval(() => {
+    activeActionPanelImage.value = (activeActionPanelImage.value + 1) % actionPanelImages.length;
   }, 5000);
   const comments = document.getElementById('community-comments');
   if (comments && 'IntersectionObserver' in window) {
@@ -407,7 +408,7 @@ onMounted(() => {
 });
 onUnmounted(() => {
   window.removeEventListener('keydown', handlePanelKeydown);
-  if (heroImageTimer) window.clearInterval(heroImageTimer);
+  if (actionPanelImageTimer) window.clearInterval(actionPanelImageTimer);
   if (toastTimer) clearTimeout(toastTimer);
 });
 </script>
@@ -483,7 +484,12 @@ h1 em { color: var(--amber-400); font-style: normal; }
 .quick-action em { font-size: 10px; font-style: normal; letter-spacing: 0; text-transform: none; opacity: .68; }
 .quick-action strong { font-size: 14px; font-weight: 650; }
 .quick-action--play small, .quick-action--play em { color: rgba(9, 16, 19, .7); }
-.launcher-menu { max-width: 868px; margin: -5px auto 16px; padding: 18px 20px 20px; background: rgba(17, 32, 35, .72); border: 1px solid var(--line-strong); box-shadow: 0 24px 70px rgba(0, 0, 0, .2); }
+.launcher-menu { position: relative; isolation: isolate; overflow: hidden; max-width: 868px; margin: -5px auto 16px; padding: 18px 20px 20px; background: rgba(17, 32, 35, .72); border: 1px solid var(--line-strong); box-shadow: 0 24px 70px rgba(0, 0, 0, .2); }
+.launcher-menu__background { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: rgba(9, 16, 19, .5); }
+.launcher-menu__background::after { position: absolute; inset: 0; content: ""; background: linear-gradient(90deg, rgba(9, 16, 19, .96), rgba(9, 16, 19, .65) 50%, rgba(9, 16, 19, .82)), linear-gradient(180deg, rgba(9, 16, 19, .48), rgba(9, 16, 19, .88)); }
+.launcher-menu__background-image { position: absolute; inset: -3%; background-position: center; background-size: cover; opacity: 0; transform: scale(1.05); transition: opacity 1.1s ease, transform 6s ease; }
+.launcher-menu__background-image--active { opacity: .7; transform: scale(1.11); }
+.launcher-menu__title, .launcher-menu__buttons { position: relative; z-index: 1; }
 .launcher-menu__title { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px 16px; color: var(--fog-100); }
 .launcher-menu__title span { font-size: clamp(28px, 4vw, 46px); font-weight: 700; letter-spacing: .12em; }
 .launcher-menu__title small { color: var(--fog-500); font: 500 10px/1 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
@@ -586,8 +592,7 @@ h1 em { text-shadow: 0 0 42px rgba(246, 185, 79, .14); }
 .hero-visual { min-height: 500px; isolation: isolate; border-color: rgba(112, 206, 197, .27); box-shadow: 0 30px 90px rgba(0, 0, 0, .43), inset 0 0 0 1px rgba(246, 185, 79, .07); }
 .hero-image-stack { position: absolute; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
 .hero-image, .hero-image-shade { position: absolute; inset: 0; pointer-events: none; }
-.hero-image { background-position: center; background-size: cover; opacity: 0; transform: scale(1.07); transition: opacity 1.1s ease, transform 6s ease; }
-.hero-image--active { opacity: .76; transform: scale(1.13); }
+.hero-image { z-index: -2; background: url("/game-hero.jpg") center 46% / cover no-repeat; opacity: .73; transform: scale(1.07); animation: heroDrift 18s ease-in-out infinite alternate; }
 .hero-image-shade { z-index: -1; background: linear-gradient(180deg, rgba(8, 13, 16, .4), rgba(8, 13, 16, .22) 40%, rgba(8, 13, 16, .9)), linear-gradient(90deg, rgba(8, 13, 16, .85), transparent 68%); }
 .hero-visual::before { z-index: 0; opacity: .32; background: radial-gradient(circle at 54% 52%, rgba(246, 185, 79, .32), transparent 37%); }
 .visual-topline { color: rgba(242, 240, 232, .58); }
