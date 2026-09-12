@@ -56,34 +56,38 @@
       </div>
 
       <transition name="menu-panel">
-        <section v-if="activePanel !== 'none'" class="menu-panel menu-panel--top" :aria-labelledby="`${activePanel}-panel-title`" role="dialog" aria-modal="false">
-          <div class="menu-panel__header">
-            <div>
-              <span class="menu-panel__kicker">Launcher / {{ activePanelIndex }}</span>
-              <h3 :id="`${activePanel}-panel-title`">{{ activePanelTitle }}</h3>
+        <div v-if="activePanel !== 'none'" class="menu-panel-backdrop" @click.self="closePanel">
+          <section class="menu-panel menu-panel--top" :aria-labelledby="`${activePanel}-panel-title`" role="dialog" aria-modal="true">
+            <div class="menu-panel__header">
+              <div>
+                <span class="menu-panel__kicker">Launcher / {{ activePanelIndex }}</span>
+                <h3 :id="`${activePanel}-panel-title`">{{ activePanelTitle }}</h3>
+              </div>
+              <button class="menu-panel__close" type="button" aria-label="Close panel" title="Close panel" @click="closePanel">
+                <span aria-hidden="true">×</span>
+              </button>
             </div>
-            <button class="menu-panel__close" type="button" aria-label="Close panel" @click="closePanel">Close <span aria-hidden="true">×</span></button>
-          </div>
 
-          <div v-if="activePanel === 'play'" class="menu-panel__content menu-panel__content--play">
-            <p>Start the included Uplink demo immediately, or use your own licensed Half-Life or Counter-Strike files. Everything stays in this browser.</p>
-            <div class="menu-panel__actions">
-              <button class="button button--primary" type="button" @click="startUplink"><span class="button-play" aria-hidden="true"></span> Play Uplink now</button>
-              <button class="button button--quiet" type="button" @click="scrollToSection('game-files'); closePanel()">Add your own game files ↘</button>
+            <div v-if="activePanel === 'play'" class="menu-panel__content menu-panel__content--play">
+              <p>Start the included Uplink demo immediately, or use your own licensed Half-Life or Counter-Strike files. Everything stays in this browser.</p>
+              <div class="menu-panel__actions">
+                <button class="button button--primary" type="button" @click="startUplink"><span class="button-play" aria-hidden="true"></span> Play Uplink now</button>
+                <button class="button button--quiet" type="button" @click="scrollToSection('game-files'); closePanel()">Add your own game files ↘</button>
+              </div>
             </div>
-          </div>
-          <div v-else-if="activePanel === 'saves'" class="menu-panel__content menu-panel__content--component">
-            <XashSaves />
-          </div>
-          <div v-else-if="activePanel === 'multiplayer'" class="menu-panel__content menu-panel__content--component">
-            <p class="menu-panel__help">Enter a compatible server address, then use the launch button below when you are ready.</p>
-            <XashMultiplayerIP />
-          </div>
-          <div v-else class="menu-panel__content menu-panel__content--component">
-            <XashLaunchOptions />
-            <button class="button button--quiet menu-panel__fullscreen" type="button" @click="toggleFullscreen">Toggle browser fullscreen</button>
-          </div>
-        </section>
+            <div v-else-if="activePanel === 'saves'" class="menu-panel__content menu-panel__content--component">
+              <XashSaves />
+            </div>
+            <div v-else-if="activePanel === 'multiplayer'" class="menu-panel__content menu-panel__content--component">
+              <p class="menu-panel__help">Enter a compatible server address, then use the launch button below when you are ready.</p>
+              <XashMultiplayerIP />
+            </div>
+            <div v-else class="menu-panel__content menu-panel__content--component">
+              <XashLaunchOptions />
+              <button class="button button--quiet menu-panel__fullscreen" type="button" @click="toggleFullscreen">Toggle browser fullscreen</button>
+            </div>
+          </section>
+        </div>
       </transition>
 
       <section class="hero" aria-labelledby="hero-title">
@@ -292,6 +296,9 @@ const activePanelIndex = computed(() => ({
 }[activePanel.value]));
 const openPanel = (panel: Exclude<PanelName, 'none'>) => { activePanel.value = panel; };
 const closePanel = () => { activePanel.value = 'none'; };
+const handlePanelKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && activePanel.value !== 'none') closePanel();
+};
 
 const faqCategories = ['All', 'How to Play', 'Multiplayer', 'Emulation & Tech', 'Android & Devices'];
 const selectedFaqCategory = ref('All');
@@ -378,13 +385,17 @@ const startUplink = async () => {
 onMounted(() => {
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   window.scrollTo(0, 0);
+  window.addEventListener('keydown', handlePanelKeydown);
   const comments = document.getElementById('community-comments');
   if (comments && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) { loadDisqus(); observer.disconnect(); } }, { rootMargin: '300px' });
     observer.observe(comments);
   }
 });
-onUnmounted(() => { if (toastTimer) clearTimeout(toastTimer); });
+onUnmounted(() => {
+  window.removeEventListener('keydown', handlePanelKeydown);
+  if (toastTimer) clearTimeout(toastTimer);
+});
 </script>
 
 <style scoped>
@@ -468,12 +479,13 @@ h1 em { color: var(--amber-400); font-style: normal; }
 .menu-button--primary { color: var(--fog-100); background: rgba(35, 56, 60, .9); border-color: rgba(243, 181, 72, .32); }
 .menu-button span { font-size: 15px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
 .menu-button small { color: var(--fog-500); font-size: 11px; }
-.menu-panel { max-width: 868px; margin: 0 auto 22px; padding: 22px; background: rgba(13, 23, 26, .96); border: 1px solid var(--line-strong); box-shadow: 0 30px 90px rgba(0, 0, 0, .38); }
+.menu-panel-backdrop { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; overflow-y: auto; padding: 96px 22px 32px; background: rgba(4, 9, 11, .72); backdrop-filter: blur(8px); }
+.menu-panel { width: min(868px, 100%); max-height: min(760px, calc(100dvh - 128px)); overflow-y: auto; margin: 0 auto; padding: 22px; background: rgba(13, 23, 26, .98); border: 1px solid var(--line-strong); box-shadow: 0 30px 90px rgba(0, 0, 0, .6), 0 0 0 1px rgba(243, 181, 72, .08); }
 .menu-panel__header { display: flex; align-items: start; justify-content: space-between; gap: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
 .menu-panel__kicker { display: block; margin-bottom: 8px; color: var(--amber-400); font: 500 10px/1 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
 .menu-panel__header h3 { color: var(--fog-100); font-size: clamp(23px, 3vw, 34px); font-weight: 600; letter-spacing: -.04em; }
-.menu-panel__close { padding: 7px 10px; color: var(--fog-500); cursor: pointer; background: transparent; border: 1px solid var(--line); border-radius: 2px; font: 500 10px/1 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
-.menu-panel__close:hover { color: var(--fog-100); border-color: var(--line-strong); }
+.menu-panel__close { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 38px; padding: 0; color: var(--fog-300); cursor: pointer; background: rgba(26, 43, 52, .7); border: 1px solid var(--line); border-radius: 50%; font: 400 27px/1 'DM Mono', monospace; transition: color .18s ease, background-color .18s ease, border-color .18s ease, transform .18s ease; }
+.menu-panel__close:hover, .menu-panel__close:focus-visible { color: var(--ink-950); background: var(--amber-400); border-color: var(--amber-400); transform: rotate(90deg); }
 .menu-panel__content { padding-top: 20px; }
 .menu-panel__content--play { display: grid; gap: 20px; }
 .menu-panel__content--play > p, .menu-panel__help { max-width: 640px; color: var(--fog-300); font-size: 13px; line-height: 1.65; }
@@ -603,7 +615,7 @@ h1 em { text-shadow: 0 0 42px rgba(246, 185, 79, .14); }
   .site-header { padding-inline: 22px; }.site-nav { display: none; }.app-content { padding-inline: 22px; }.hero { grid-template-columns: 1fr; gap: 45px; min-height: auto; }.hero-visual { max-width: 600px; width: 100%; }.launcher-menu { max-width: none; }.quick-actions { grid-template-columns: repeat(2, 1fr); }.launcher-layout { grid-template-columns: 1fr; }.launcher-sidebar { grid-template-columns: repeat(2, 1fr); align-items: start; }.panel--game, .panel--demos { grid-column: span 1; }.panel--source { grid-column: span 2; }.site-footer { grid-template-columns: 1fr 1fr; padding-inline: 22px; }.footer-links { justify-content: start; grid-column: span 2; }
 }
 @media (max-width: 620px) {
-  .site-header { padding: 14px 17px; }.engine-state, .header-icon-button { display: none; }.header-actions { margin-left: auto; }.header-launch { padding: 10px 12px; }.app-content { padding: 52px 17px 72px; }.hero { gap: 33px; }.hero-lead { font-size: 15px; }.hero-visual { min-height: 350px; }.lambda-visual { min-height: 230px; }.lambda-visual img { width: 220px; height: 220px; }.lambda-visual span { font-size: 150px; }.section-heading { display: block; }.section-heading > p { margin-top: 16px; }.launcher-section, .how-section, .faq-section, .community-section { margin-top: 82px; }.quick-actions { grid-template-columns: 1fr; }.quick-action--play { min-height: 84px; }.launcher-menu { padding: 14px; }.launcher-menu__title { display: grid; gap: 6px; }.launcher-menu__title span { font-size: 30px; }.menu-button { display: grid; gap: 6px; min-height: 66px; }.menu-button small { line-height: 1.35; }.menu-panel { padding: 16px; }.menu-panel__header { align-items: center; }.menu-panel__close { font-size: 9px; }.launcher-sidebar { display: grid; grid-template-columns: 1fr; }.panel--source { grid-column: auto; }.options-grid, .steps { grid-template-columns: 1fr; }.option-block--network { padding: 20px 0 0; border-top: 1px solid var(--line); border-left: 0; }.launch-strip { display: block; }.button--launch { width: 100%; margin-top: 17px; }.faq-tools { display: block; }.faq-search { display: block; margin: 12px 0 0; }.faq-search input { width: 100%; }.section-heading--compact .text-button { margin-top: 15px; }.site-footer { grid-template-columns: 1fr; padding: 24px 17px 35px; }.footer-links { grid-column: auto; flex-wrap: wrap; }.footer-links a { padding-left: 0; }
+  .site-header { padding: 14px 17px; }.engine-state, .header-icon-button { display: none; }.header-actions { margin-left: auto; }.header-launch { padding: 10px 12px; }.app-content { padding: 52px 17px 72px; }.hero { gap: 33px; }.hero-lead { font-size: 15px; }.hero-visual { min-height: 350px; }.lambda-visual { min-height: 230px; }.lambda-visual img { width: 220px; height: 220px; }.lambda-visual span { font-size: 150px; }.section-heading { display: block; }.section-heading > p { margin-top: 16px; }.launcher-section, .how-section, .faq-section, .community-section { margin-top: 82px; }.quick-actions { grid-template-columns: 1fr; }.quick-action--play { min-height: 84px; }.launcher-menu { padding: 14px; }.launcher-menu__title { display: grid; gap: 6px; }.launcher-menu__title span { font-size: 30px; }.menu-button { display: grid; gap: 6px; min-height: 66px; }.menu-button small { line-height: 1.35; }.menu-panel-backdrop { align-items: start; padding: 80px 12px 20px; }.menu-panel { max-height: calc(100dvh - 100px); padding: 16px; }.menu-panel__header { align-items: center; }.menu-panel__close { width: 34px; height: 34px; flex-basis: 34px; font-size: 23px; }.launcher-sidebar { display: grid; grid-template-columns: 1fr; }.panel--source { grid-column: auto; }.options-grid, .steps { grid-template-columns: 1fr; }.option-block--network { padding: 20px 0 0; border-top: 1px solid var(--line); border-left: 0; }.launch-strip { display: block; }.button--launch { width: 100%; margin-top: 17px; }.faq-tools { display: block; }.faq-search { display: block; margin: 12px 0 0; }.faq-search input { width: 100%; }.section-heading--compact .text-button { margin-top: 15px; }.site-footer { grid-template-columns: 1fr; padding: 24px 17px 35px; }.footer-links { grid-column: auto; flex-wrap: wrap; }.footer-links a { padding-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
