@@ -99,29 +99,8 @@
         </div>
       </transition>
 
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <h1 id="hero-title">The signal is live.<br /><em>Press play.</em></h1>
-          <p class="hero-lead">
-            A tiny doorway back to the worlds that started it all. Play the included Uplink
-            demo instantly, or bring the game files you already own and keep the whole session
-            on your device.
-          </p>
-          <div class="hero-actions">
-            <button class="button button--primary button--hero-play" type="button" @click="startUplink">
-              <span class="button-play" aria-hidden="true"></span>
-              Play Uplink now
-            </button>
-            <button class="button button--quiet" type="button" @click="scrollToSetup">
-              Bring your own files <span aria-hidden="true">↘</span>
-            </button>
-          </div>
-          <div class="ownership-note">
-            <span class="note-icon" aria-hidden="true">✓</span>
-            <span><strong>Local by design.</strong> Uplink is included; your licensed files never leave this browser.</span>
-          </div>
-        </div>
-        <div class="hero-visual" aria-label="Engine status and game atmosphere">
+      <section class="hero hero--visual-only" aria-label="Game atmosphere">
+        <div class="hero-visual">
           <div class="hero-image" aria-hidden="true"></div>
           <div class="hero-image-shade" aria-hidden="true"></div>
           <div class="visual-topline"><span>LOCAL SESSION</span><span>WX / 64</span></div>
@@ -363,7 +342,6 @@ const showToast = (message: string) => {
   toastTimer = window.setTimeout(() => { toastMessage.value = ''; }, 2800);
 };
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-const scrollToSetup = () => document.getElementById('setup')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 const toggleFullscreen = () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => showToast('Fullscreen is not supported here'));
   else document.exitFullscreen().catch(() => undefined);
@@ -582,6 +560,8 @@ h1 em { color: var(--amber-400); font-style: normal; }
 .brand-copy strong { font-size: 15px; letter-spacing: .19em; }
 .header-launch { box-shadow: 0 8px 24px rgba(246, 185, 79, .12); }
 .hero { min-height: 630px; }
+.hero.hero--visual-only { grid-template-columns: minmax(0, 1fr); min-height: auto; }
+.hero--visual-only .hero-visual { width: min(100%, 868px); margin-inline: auto; }
 .hero-copy { position: relative; z-index: 2; }
 .hero-copy::before { position: absolute; top: -105px; left: -80px; width: 320px; height: 320px; content: ""; pointer-events: none; background: radial-gradient(circle, rgba(246, 185, 79, .09), transparent 68%); }
 h1 { font-size: clamp(57px, 8vw, 116px); line-height: .86; letter-spacing: -.078em; }
