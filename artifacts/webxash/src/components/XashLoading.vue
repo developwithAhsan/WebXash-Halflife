@@ -3,7 +3,7 @@
     <div class="xash-loading-card">
       <div class="loading-brand">
         <span class="loading-mark" aria-hidden="true">λ</span>
-        <div><strong>WEBXASH</strong><small>Starting local session</small></div>
+        <div><strong>LOCAL SESSION</strong><small>Starting game</small></div>
       </div>
       <div class="loading-header">
         <div class="status-indicator"><span class="pulse-dot"></span><span>Preparing engine</span></div>

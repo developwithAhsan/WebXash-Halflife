@@ -5,10 +5,10 @@
     <div class="scanlines" aria-hidden="true"></div>
 
     <header class="site-header">
-      <a class="brand" href="#home" aria-label="WebXash home" @click.prevent="scrollToTop">
+      <a class="brand" href="#home" aria-label="Home" @click.prevent="scrollToTop">
         <span class="brand-mark" aria-hidden="true">λ</span>
         <span class="brand-copy">
-          <strong>WEBXASH</strong>
+          <strong>BROWSER LAUNCHER</strong>
           <small>GOLDSRC / WASM</small>
         </span>
       </a>
@@ -30,6 +30,62 @@
     </header>
 
     <main v-if="!loading" class="app-content">
+      <div class="launcher-menu launcher-menu--top" aria-label="Launcher menu">
+        <div class="launcher-menu__title">
+          <span>Choose an action</span>
+          <small>Browser game launcher</small>
+        </div>
+        <div class="launcher-menu__buttons">
+          <button class="menu-button menu-button--primary" type="button" @click="openPanel('play')">
+            <span>Play game</span>
+            <small>Start the included Uplink demo or add your own game files</small>
+          </button>
+          <button class="menu-button" type="button" @click="openPanel('saves')">
+            <span>Save manager</span>
+            <small>Manage local saves and download a backup</small>
+          </button>
+          <button class="menu-button" type="button" @click="openPanel('multiplayer')">
+            <span>Multiplayer</span>
+            <small>Enter a compatible GoldSrc server address</small>
+          </button>
+          <button class="menu-button" type="button" @click="openPanel('options')">
+            <span>Options</span>
+            <small>FPS limit, fullscreen, touch controls and more</small>
+          </button>
+        </div>
+      </div>
+
+      <transition name="menu-panel">
+        <section v-if="activePanel !== 'none'" class="menu-panel menu-panel--top" :aria-labelledby="`${activePanel}-panel-title`" role="dialog" aria-modal="false">
+          <div class="menu-panel__header">
+            <div>
+              <span class="menu-panel__kicker">Launcher / {{ activePanelIndex }}</span>
+              <h3 :id="`${activePanel}-panel-title`">{{ activePanelTitle }}</h3>
+            </div>
+            <button class="menu-panel__close" type="button" aria-label="Close panel" @click="closePanel">Close <span aria-hidden="true">×</span></button>
+          </div>
+
+          <div v-if="activePanel === 'play'" class="menu-panel__content menu-panel__content--play">
+            <p>Start the included Uplink demo immediately, or use your own licensed Half-Life or Counter-Strike files. Everything stays in this browser.</p>
+            <div class="menu-panel__actions">
+              <button class="button button--primary" type="button" @click="startUplink"><span class="button-play" aria-hidden="true"></span> Play Uplink now</button>
+              <button class="button button--quiet" type="button" @click="scrollToSection('game-files'); closePanel()">Add your own game files ↘</button>
+            </div>
+          </div>
+          <div v-else-if="activePanel === 'saves'" class="menu-panel__content menu-panel__content--component">
+            <XashSaves />
+          </div>
+          <div v-else-if="activePanel === 'multiplayer'" class="menu-panel__content menu-panel__content--component">
+            <p class="menu-panel__help">Enter a compatible server address, then use the launch button below when you are ready.</p>
+            <XashMultiplayerIP />
+          </div>
+          <div v-else class="menu-panel__content menu-panel__content--component">
+            <XashLaunchOptions />
+            <button class="button button--quiet menu-panel__fullscreen" type="button" @click="toggleFullscreen">Toggle browser fullscreen</button>
+          </div>
+        </section>
+      </transition>
+
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
           <div class="eyebrow"><span class="eyebrow-rule"></span> Personal game launcher / 01</div>
@@ -53,7 +109,7 @@
             <span><strong>Local by design.</strong> Uplink is included; your licensed files never leave this browser.</span>
           </div>
         </div>
-        <div class="hero-visual" aria-label="WebXash engine status and game atmosphere">
+        <div class="hero-visual" aria-label="Engine status and game atmosphere">
           <div class="hero-image" aria-hidden="true"></div>
           <div class="hero-image-shade" aria-hidden="true"></div>
           <div class="visual-topline"><span>LOCAL SESSION</span><span>WX / 64</span></div>
@@ -84,62 +140,6 @@
           </div>
           <p>Choose a game, point us to its files, then launch. Your last choices are remembered on this device.</p>
         </div>
-
-        <div class="launcher-menu" aria-label="Launcher menu">
-          <div class="launcher-menu__title">
-            <span>WEBXASH</span>
-            <small>Choose an action</small>
-          </div>
-          <div class="launcher-menu__buttons">
-            <button class="menu-button menu-button--primary" type="button" @click="openPanel('play')">
-              <span>Play game</span>
-              <small>Start the included Uplink demo or add your own game files</small>
-            </button>
-            <button class="menu-button" type="button" @click="openPanel('saves')">
-              <span>Save manager</span>
-              <small>Manage local saves and download a backup</small>
-            </button>
-            <button class="menu-button" type="button" @click="openPanel('multiplayer')">
-              <span>Multiplayer</span>
-              <small>Enter a compatible GoldSrc server address</small>
-            </button>
-            <button class="menu-button" type="button" @click="openPanel('options')">
-              <span>Options</span>
-              <small>FPS limit, fullscreen, touch controls and more</small>
-            </button>
-          </div>
-        </div>
-
-        <transition name="menu-panel">
-          <section v-if="activePanel !== 'none'" class="menu-panel" :aria-labelledby="`${activePanel}-panel-title`" role="dialog" aria-modal="false">
-            <div class="menu-panel__header">
-              <div>
-                <span class="menu-panel__kicker">WebXash / {{ activePanelIndex }}</span>
-                <h3 :id="`${activePanel}-panel-title`">{{ activePanelTitle }}</h3>
-              </div>
-              <button class="menu-panel__close" type="button" aria-label="Close panel" @click="closePanel">Close <span aria-hidden="true">×</span></button>
-            </div>
-
-            <div v-if="activePanel === 'play'" class="menu-panel__content menu-panel__content--play">
-              <p>Start the included Uplink demo immediately, or use your own licensed Half-Life or Counter-Strike files. Everything stays in this browser.</p>
-              <div class="menu-panel__actions">
-                <button class="button button--primary" type="button" @click="startUplink"><span class="button-play" aria-hidden="true"></span> Play Uplink now</button>
-                <button class="button button--quiet" type="button" @click="scrollToSection('game-files'); closePanel()">Add your own game files ↘</button>
-              </div>
-            </div>
-            <div v-else-if="activePanel === 'saves'" id="save-manager" class="menu-panel__content menu-panel__content--component">
-              <XashSaves />
-            </div>
-            <div v-else-if="activePanel === 'multiplayer'" id="multiplayer" class="menu-panel__content menu-panel__content--component">
-              <p class="menu-panel__help">Enter a compatible server address, then use the launch button below when you are ready.</p>
-              <XashMultiplayerIP />
-            </div>
-            <div v-else id="session-options" class="menu-panel__content menu-panel__content--component">
-              <XashLaunchOptions />
-              <button class="button button--quiet menu-panel__fullscreen" type="button" @click="toggleFullscreen">Toggle browser fullscreen</button>
-            </div>
-          </section>
-        </transition>
 
         <div class="launcher-layout">
           <aside class="launcher-sidebar">
@@ -191,12 +191,12 @@
             <div class="eyebrow"><span class="eyebrow-rule"></span> No mystery / 03</div>
             <h2 id="how-title">Three steps to Black Mesa.</h2>
           </div>
-          <p>WebXash is a browser front-end for the engine. It does not include commercial game data.</p>
+          <p>This is a browser front-end for the engine. It does not include commercial game data.</p>
         </div>
         <div class="steps">
           <article class="step-card step-card--copy"><span class="step-number">01</span><h3>Bring your copy</h3><p>Use an installed Half-Life or Counter-Strike folder, or select a compatible ZIP from your device.</p></article>
           <article class="step-card step-card--engine"><span class="step-number">02</span><h3>We prepare the engine</h3><p>Files are unpacked into browser storage and the open-source Xash3D engine initializes locally.</p></article>
-          <article class="step-card step-card--return"><span class="step-number">03</span><h3>Play and come back</h3><p>Your settings and browser saves are ready the next time you open WebXash on this device.</p></article>
+          <article class="step-card step-card--return"><span class="step-number">03</span><h3>Play and come back</h3><p>Your settings and browser saves are ready the next time you open this launcher on your device.</p></article>
         </div>
       </section>
 
@@ -233,7 +233,7 @@
           <button class="button button--quiet" type="button" @click="loadDisqus">Refresh discussion</button>
         </div>
         <div class="community-card">
-          <div class="community-card-top"><span><i></i> WebXash discussion</span><span>{{ disqusLoaded ? 'Connected' : 'Ready to load' }}</span></div>
+          <div class="community-card-top"><span><i></i> Community discussion</span><span>{{ disqusLoaded ? 'Connected' : 'Ready to load' }}</span></div>
           <div id="disqus_thread" class="disqus-thread-container"></div>
           <p v-if="!disqusLoaded" class="community-empty">The discussion board loads when you ask for it. Share fixes, server addresses, and stories from the lab.</p>
           <noscript>Enable JavaScript to view the community discussion.</noscript>
@@ -247,8 +247,8 @@
     </transition>
 
     <footer class="site-footer">
-      <div class="footer-brand"><span class="brand-mark" aria-hidden="true">λ</span><span>WEBXASH / LOCAL GOLD SOURCE</span></div>
-      <p>WebXash is an independent, open-source browser port powered by Xash3D FWGS. Half-Life and Counter-Strike are trademarks of Valve Corporation. Bring and use game files you are licensed to use.</p>
+      <div class="footer-brand"><span class="brand-mark" aria-hidden="true">λ</span><span>LOCAL GOLD SOURCE</span></div>
+      <p>This is an independent, open-source browser port powered by Xash3D FWGS. Half-Life and Counter-Strike are trademarks of Valve Corporation. Bring and use game files you are licensed to use.</p>
       <div class="footer-links"><a href="https://github.com/x8BitRain/webXash/" target="_blank" rel="noopener noreferrer">Source</a><a href="https://github.com/x8BitRain/webXash/?tab=readme-ov-file#how-to-use" target="_blank" rel="noopener noreferrer">Documentation</a><a href="#home" @click.prevent="scrollToTop">Back to top ↑</a></div>
     </footer>
   </div>
@@ -298,8 +298,8 @@ const selectedFaqCategory = ref('All');
 const faqSearchQuery = ref('');
 const openFaqMap = ref<Record<string, boolean>>({ 'how-1': true, 'can-1': false, 'multi-1': false, 'emu-1': false, 'save-1': false });
 const faqData = [
-  { id: 'how-1', category: 'How to Play', q: 'What files do I need to bring?', a: 'Use game files from a copy you own. Select the folder that contains the game data, or choose a compatible ZIP. WebXash does not provide commercial game files and never uploads the files you select.' },
-  { id: 'can-1', category: 'How to Play', q: 'Will my keyboard and mouse work?', a: 'Yes. WebXash uses Pointer Lock for mouse look and supports the familiar WASD, mouse, Space, Ctrl, E, and R controls. Click the game canvas once it launches to capture the pointer.' },
+  { id: 'how-1', category: 'How to Play', q: 'What files do I need to bring?', a: 'Use game files from a copy you own. Select the folder that contains the game data, or choose a compatible ZIP. This launcher does not provide commercial game files and never uploads the files you select.' },
+  { id: 'can-1', category: 'How to Play', q: 'Will my keyboard and mouse work?', a: 'Yes. The launcher uses Pointer Lock for mouse look and supports the familiar WASD, mouse, Space, Ctrl, E, and R controls. Click the game canvas once it launches to capture the pointer.' },
   { id: 'multi-1', category: 'Multiplayer', q: 'How do I connect to a server?', a: 'Open the developer console with the tilde key and use the standard GoldSrc connect command. The Multiplayer server field is available for launch setups that use a compatible WebSocket proxy.' },
   { id: 'emu-1', category: 'Emulation & Tech', q: 'Where do the files go?', a: 'The engine runs in WebAssembly and uses browser storage on this device. Your selected files are read locally; browser saves and settings can be managed from the launcher.' },
   { id: 'save-1', category: 'Emulation & Tech', q: 'Can I back up my save games?', a: 'Yes. Use the Saves panel to add save files, select one, and download a copy. Saves live in your browser storage and are tied to this device and browser profile.' },
@@ -318,7 +318,7 @@ const loadDisqus = () => {
     (window as any).disqus_config = function (this: any) {
       this.page.url = window.location.href;
       this.page.identifier = 'webxash-main-discussion';
-      this.page.title = 'WebXash community discussion';
+      this.page.title = 'Browser game community discussion';
     };
     if ((window as any).DISQUS) {
       (window as any).DISQUS.reset({ reload: true, config: (window as any).disqus_config });
