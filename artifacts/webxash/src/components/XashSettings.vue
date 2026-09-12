@@ -92,8 +92,7 @@
 
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <div class="eyebrow"><span class="eyebrow-rule"></span> Personal game launcher / 01</div>
-           <h1 id="hero-title">The signal is live.<br /><em>Press play.</em></h1>
+          <h1 id="hero-title">The signal is live.<br /><em>Press play.</em></h1>
           <p class="hero-lead">
             A tiny doorway back to the worlds that started it all. Play the included Uplink
             demo instantly, or bring the game files you already own and keep the whole session
@@ -114,7 +113,15 @@
           </div>
         </div>
         <div class="hero-visual" aria-label="Engine status and game atmosphere">
-          <div class="hero-image" aria-hidden="true"></div>
+          <div class="hero-image-stack" aria-hidden="true">
+            <div
+              v-for="(image, index) in heroImages"
+              :key="image"
+              class="hero-image"
+              :class="{ 'hero-image--active': activeHeroImage === index }"
+              :style="{ backgroundImage: `url('${image}')` }"
+            ></div>
+          </div>
           <div class="hero-image-shade" aria-hidden="true"></div>
           <div class="visual-topline"><span>LOCAL SESSION</span><span>WX / 64</span></div>
           <div class="lambda-visual" aria-hidden="true">
@@ -299,6 +306,9 @@ const closePanel = () => { activePanel.value = 'none'; };
 const handlePanelKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && activePanel.value !== 'none') closePanel();
 };
+const heroImages = ['/scene-01.jpeg', '/scene-02.jpeg', '/scene-03.jpeg', '/scene-04.png'];
+const activeHeroImage = ref(0);
+let heroImageTimer: number | null = null;
 
 const faqCategories = ['All', 'How to Play', 'Multiplayer', 'Emulation & Tech', 'Android & Devices'];
 const selectedFaqCategory = ref('All');
@@ -386,6 +396,9 @@ onMounted(() => {
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   window.scrollTo(0, 0);
   window.addEventListener('keydown', handlePanelKeydown);
+  heroImageTimer = window.setInterval(() => {
+    activeHeroImage.value = (activeHeroImage.value + 1) % heroImages.length;
+  }, 5000);
   const comments = document.getElementById('community-comments');
   if (comments && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) { loadDisqus(); observer.disconnect(); } }, { rootMargin: '300px' });
@@ -394,6 +407,7 @@ onMounted(() => {
 });
 onUnmounted(() => {
   window.removeEventListener('keydown', handlePanelKeydown);
+  if (heroImageTimer) window.clearInterval(heroImageTimer);
   if (toastTimer) clearTimeout(toastTimer);
 });
 </script>
@@ -570,8 +584,10 @@ h1 em { text-shadow: 0 0 42px rgba(246, 185, 79, .14); }
 .hero-actions { margin-top: 38px; }
 .button--hero-play { min-width: 168px; padding-block: 16px; box-shadow: 0 15px 32px rgba(246, 185, 79, .12); }
 .hero-visual { min-height: 500px; isolation: isolate; border-color: rgba(112, 206, 197, .27); box-shadow: 0 30px 90px rgba(0, 0, 0, .43), inset 0 0 0 1px rgba(246, 185, 79, .07); }
+.hero-image-stack { position: absolute; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
 .hero-image, .hero-image-shade { position: absolute; inset: 0; pointer-events: none; }
-.hero-image { z-index: -2; background: url("/game-hero.jpg") center 46% / cover no-repeat; opacity: .73; transform: scale(1.07); animation: heroDrift 18s ease-in-out infinite alternate; }
+.hero-image { background-position: center; background-size: cover; opacity: 0; transform: scale(1.07); transition: opacity 1.1s ease, transform 6s ease; }
+.hero-image--active { opacity: .76; transform: scale(1.13); }
 .hero-image-shade { z-index: -1; background: linear-gradient(180deg, rgba(8, 13, 16, .4), rgba(8, 13, 16, .22) 40%, rgba(8, 13, 16, .9)), linear-gradient(90deg, rgba(8, 13, 16, .85), transparent 68%); }
 .hero-visual::before { z-index: 0; opacity: .32; background: radial-gradient(circle at 54% 52%, rgba(246, 185, 79, .32), transparent 37%); }
 .visual-topline { color: rgba(242, 240, 232, .58); }
