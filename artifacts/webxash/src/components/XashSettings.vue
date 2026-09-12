@@ -85,24 +85,61 @@
           <p>Choose a game, point us to its files, then launch. Your last choices are remembered on this device.</p>
         </div>
 
-        <div class="quick-actions" aria-label="Launcher quick actions">
-          <button class="quick-action quick-action--play" type="button" @click="startUplink">
-            <span class="quick-action-icon quick-action-icon--play" aria-hidden="true"><span class="button-play"></span></span>
-            <span><small>01 / Start here</small><strong>Play Uplink</strong><em>Launch the included demo</em></span>
-          </button>
-          <button class="quick-action" type="button" @click="scrollToSection('save-manager')">
-            <span class="quick-action-icon" aria-hidden="true">▣</span>
-            <span><small>02</small><strong>Save manager</strong><em>Back up local saves</em></span>
-          </button>
-          <button class="quick-action" type="button" @click="scrollToSection('multiplayer')">
-            <span class="quick-action-icon" aria-hidden="true">↗</span>
-            <span><small>03</small><strong>Multiplayer</strong><em>Connect a server</em></span>
-          </button>
-          <button class="quick-action" type="button" @click="scrollToSection('session-options')">
-            <span class="quick-action-icon" aria-hidden="true">⌘</span>
-            <span><small>04</small><strong>Options</strong><em>FPS, fullscreen and more</em></span>
-          </button>
+        <div class="launcher-menu" aria-label="Launcher menu">
+          <div class="launcher-menu__title">
+            <span>WEBXASH</span>
+            <small>Choose an action</small>
+          </div>
+          <div class="launcher-menu__buttons">
+            <button class="menu-button menu-button--primary" type="button" @click="openPanel('play')">
+              <span>Play game</span>
+              <small>Start the included Uplink demo or add your own game files</small>
+            </button>
+            <button class="menu-button" type="button" @click="openPanel('saves')">
+              <span>Save manager</span>
+              <small>Manage local saves and download a backup</small>
+            </button>
+            <button class="menu-button" type="button" @click="openPanel('multiplayer')">
+              <span>Multiplayer</span>
+              <small>Enter a compatible GoldSrc server address</small>
+            </button>
+            <button class="menu-button" type="button" @click="openPanel('options')">
+              <span>Options</span>
+              <small>FPS limit, fullscreen, touch controls and more</small>
+            </button>
+          </div>
         </div>
+
+        <transition name="menu-panel">
+          <section v-if="activePanel !== 'none'" class="menu-panel" :aria-labelledby="`${activePanel}-panel-title`" role="dialog" aria-modal="false">
+            <div class="menu-panel__header">
+              <div>
+                <span class="menu-panel__kicker">WebXash / {{ activePanelIndex }}</span>
+                <h3 :id="`${activePanel}-panel-title`">{{ activePanelTitle }}</h3>
+              </div>
+              <button class="menu-panel__close" type="button" aria-label="Close panel" @click="closePanel">Close <span aria-hidden="true">×</span></button>
+            </div>
+
+            <div v-if="activePanel === 'play'" class="menu-panel__content menu-panel__content--play">
+              <p>Start the included Uplink demo immediately, or use your own licensed Half-Life or Counter-Strike files. Everything stays in this browser.</p>
+              <div class="menu-panel__actions">
+                <button class="button button--primary" type="button" @click="startUplink"><span class="button-play" aria-hidden="true"></span> Play Uplink now</button>
+                <button class="button button--quiet" type="button" @click="scrollToSection('game-files'); closePanel()">Add your own game files ↘</button>
+              </div>
+            </div>
+            <div v-else-if="activePanel === 'saves'" id="save-manager" class="menu-panel__content menu-panel__content--component">
+              <XashSaves />
+            </div>
+            <div v-else-if="activePanel === 'multiplayer'" id="multiplayer" class="menu-panel__content menu-panel__content--component">
+              <p class="menu-panel__help">Enter a compatible server address, then use the launch button below when you are ready.</p>
+              <XashMultiplayerIP />
+            </div>
+            <div v-else id="session-options" class="menu-panel__content menu-panel__content--component">
+              <XashLaunchOptions />
+              <button class="button button--quiet menu-panel__fullscreen" type="button" @click="toggleFullscreen">Toggle browser fullscreen</button>
+            </div>
+          </section>
+        </transition>
 
         <div class="launcher-layout">
           <aside class="launcher-sidebar">
@@ -132,25 +169,6 @@
                 <strong>{{ selectedGame.name }}</strong>
               </div>
               <span class="session-path">{{ selectedGame.publicDir }}</span>
-            </div>
-
-            <div id="session-options" class="panel panel--options">
-              <div class="panel-label"><span>03</span> Tune your session</div>
-              <p class="panel-help">These options apply the next time you launch. Keep the defaults for a clean first run.</p>
-              <div class="options-grid">
-                <div class="option-block"><XashLaunchOptions /></div>
-                <div id="multiplayer" class="option-block option-block--network">
-                  <div class="mini-label">Multiplayer server</div>
-                  <p>Optional address for a compatible GoldSrc server.</p>
-                  <XashMultiplayerIP />
-                </div>
-              </div>
-            </div>
-
-            <div id="save-manager" class="panel panel--saves">
-              <div class="panel-label"><span>04</span> Your saves</div>
-              <p class="panel-help">Browser saves are stored locally. Add a save file or download a backup anytime.</p>
-              <div class="save-manager"><XashSaves /></div>
             </div>
 
             <div class="launch-strip">
@@ -256,6 +274,24 @@ import hlGlyph from '/@/assets/hl.svg?url';
 const store = useXashStore();
 const { loading, loadingProgress, maxLoadingAmount, selectedGame, selectedZip, selectedLocalFolder, xashCanvas, launchOptions, fullScreen, enableConsole, enableCheats, fpsLimit, touchControls, toastMessage, customGameArg } = storeToRefs(store);
 const { onStartLoading, refreshSavesList } = store;
+type PanelName = 'none' | 'play' | 'saves' | 'multiplayer' | 'options';
+const activePanel = ref<PanelName>('none');
+const activePanelTitle = computed(() => ({
+  none: '',
+  play: 'Play game',
+  saves: 'Save manager',
+  multiplayer: 'Multiplayer',
+  options: 'Options',
+}[activePanel.value]));
+const activePanelIndex = computed(() => ({
+  none: '00',
+  play: '01',
+  saves: '02',
+  multiplayer: '03',
+  options: '04',
+}[activePanel.value]));
+const openPanel = (panel: Exclude<PanelName, 'none'>) => { activePanel.value = panel; };
+const closePanel = () => { activePanel.value = 'none'; };
 
 const faqCategories = ['All', 'How to Play', 'Multiplayer', 'Emulation & Tech', 'Android & Devices'];
 const selectedFaqCategory = ref('All');
@@ -422,6 +458,31 @@ h1 em { color: var(--amber-400); font-style: normal; }
 .quick-action em { font-size: 10px; font-style: normal; letter-spacing: 0; text-transform: none; opacity: .68; }
 .quick-action strong { font-size: 14px; font-weight: 650; }
 .quick-action--play small, .quick-action--play em { color: rgba(9, 16, 19, .7); }
+.launcher-menu { max-width: 868px; margin: -5px auto 16px; padding: 18px 20px 20px; background: rgba(17, 32, 35, .72); border: 1px solid var(--line-strong); box-shadow: 0 24px 70px rgba(0, 0, 0, .2); }
+.launcher-menu__title { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px 16px; color: var(--fog-100); }
+.launcher-menu__title span { font-size: clamp(28px, 4vw, 46px); font-weight: 700; letter-spacing: .12em; }
+.launcher-menu__title small { color: var(--fog-500); font: 500 10px/1 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+.launcher-menu__buttons { display: grid; gap: 9px; padding-top: 16px; border-top: 1px solid var(--line); }
+.menu-button { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: 100%; min-height: 58px; padding: 14px 18px; color: var(--fog-300); text-align: left; cursor: pointer; background: rgba(26, 43, 52, .64); border: 1px solid var(--line); border-radius: 2px; transition: transform .18s ease, color .18s ease, border-color .18s ease, background-color .18s ease; }
+.menu-button:hover, .menu-button:focus-visible { color: var(--fog-100); background: rgba(39, 61, 72, .84); border-color: var(--line-strong); transform: translateX(4px); }
+.menu-button--primary { color: var(--fog-100); background: rgba(35, 56, 60, .9); border-color: rgba(243, 181, 72, .32); }
+.menu-button span { font-size: 15px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
+.menu-button small { color: var(--fog-500); font-size: 11px; }
+.menu-panel { max-width: 868px; margin: 0 auto 22px; padding: 22px; background: rgba(13, 23, 26, .96); border: 1px solid var(--line-strong); box-shadow: 0 30px 90px rgba(0, 0, 0, .38); }
+.menu-panel__header { display: flex; align-items: start; justify-content: space-between; gap: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.menu-panel__kicker { display: block; margin-bottom: 8px; color: var(--amber-400); font: 500 10px/1 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+.menu-panel__header h3 { color: var(--fog-100); font-size: clamp(23px, 3vw, 34px); font-weight: 600; letter-spacing: -.04em; }
+.menu-panel__close { padding: 7px 10px; color: var(--fog-500); cursor: pointer; background: transparent; border: 1px solid var(--line); border-radius: 2px; font: 500 10px/1 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.menu-panel__close:hover { color: var(--fog-100); border-color: var(--line-strong); }
+.menu-panel__content { padding-top: 20px; }
+.menu-panel__content--play { display: grid; gap: 20px; }
+.menu-panel__content--play > p, .menu-panel__help { max-width: 640px; color: var(--fog-300); font-size: 13px; line-height: 1.65; }
+.menu-panel__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.menu-panel__content--component :deep(.window) { background: transparent; border: 0; box-shadow: none; }
+.menu-panel__content--component :deep(.box), .menu-panel__content--component :deep(.save-controls) { padding-left: 0; padding-right: 0; }
+.menu-panel__fullscreen { margin-top: 18px; }
+.menu-panel-enter-active, .menu-panel-leave-active { transition: opacity .2s ease, transform .2s ease; }
+.menu-panel-enter-from, .menu-panel-leave-to { opacity: 0; transform: translateY(-8px); }
 .launcher-layout { display: grid; grid-template-columns: minmax(265px, .72fr) minmax(0, 1.55fr); gap: 18px; align-items: start; }
 .launcher-sidebar, .launcher-main { display: grid; gap: 14px; }
 .panel { padding: 20px; background: rgba(17, 32, 35, .68); border: 1px solid var(--line); border-radius: 9px; }
@@ -539,10 +600,10 @@ h1 em { text-shadow: 0 0 42px rgba(246, 185, 79, .14); }
 @keyframes ambientFloat { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(18px, 24px, 0); } }
 
 @media (max-width: 920px) {
-  .site-header { padding-inline: 22px; }.site-nav { display: none; }.app-content { padding-inline: 22px; }.hero { grid-template-columns: 1fr; gap: 45px; min-height: auto; }.hero-visual { max-width: 600px; width: 100%; }.quick-actions { grid-template-columns: repeat(2, 1fr); }.launcher-layout { grid-template-columns: 1fr; }.launcher-sidebar { grid-template-columns: repeat(2, 1fr); align-items: start; }.panel--game, .panel--demos { grid-column: span 1; }.panel--source { grid-column: span 2; }.site-footer { grid-template-columns: 1fr 1fr; padding-inline: 22px; }.footer-links { justify-content: start; grid-column: span 2; }
+  .site-header { padding-inline: 22px; }.site-nav { display: none; }.app-content { padding-inline: 22px; }.hero { grid-template-columns: 1fr; gap: 45px; min-height: auto; }.hero-visual { max-width: 600px; width: 100%; }.launcher-menu { max-width: none; }.quick-actions { grid-template-columns: repeat(2, 1fr); }.launcher-layout { grid-template-columns: 1fr; }.launcher-sidebar { grid-template-columns: repeat(2, 1fr); align-items: start; }.panel--game, .panel--demos { grid-column: span 1; }.panel--source { grid-column: span 2; }.site-footer { grid-template-columns: 1fr 1fr; padding-inline: 22px; }.footer-links { justify-content: start; grid-column: span 2; }
 }
 @media (max-width: 620px) {
-  .site-header { padding: 14px 17px; }.engine-state, .header-icon-button { display: none; }.header-actions { margin-left: auto; }.header-launch { padding: 10px 12px; }.app-content { padding: 52px 17px 72px; }.hero { gap: 33px; }.hero-lead { font-size: 15px; }.hero-visual { min-height: 350px; }.lambda-visual { min-height: 230px; }.lambda-visual img { width: 220px; height: 220px; }.lambda-visual span { font-size: 150px; }.section-heading { display: block; }.section-heading > p { margin-top: 16px; }.launcher-section, .how-section, .faq-section, .community-section { margin-top: 82px; }.quick-actions { grid-template-columns: 1fr; }.quick-action--play { min-height: 84px; }.launcher-sidebar { display: grid; grid-template-columns: 1fr; }.panel--source { grid-column: auto; }.options-grid, .steps { grid-template-columns: 1fr; }.option-block--network { padding: 20px 0 0; border-top: 1px solid var(--line); border-left: 0; }.launch-strip { display: block; }.button--launch { width: 100%; margin-top: 17px; }.faq-tools { display: block; }.faq-search { display: block; margin: 12px 0 0; }.faq-search input { width: 100%; }.section-heading--compact .text-button { margin-top: 15px; }.site-footer { grid-template-columns: 1fr; padding: 24px 17px 35px; }.footer-links { grid-column: auto; flex-wrap: wrap; }.footer-links a { padding-left: 0; }
+  .site-header { padding: 14px 17px; }.engine-state, .header-icon-button { display: none; }.header-actions { margin-left: auto; }.header-launch { padding: 10px 12px; }.app-content { padding: 52px 17px 72px; }.hero { gap: 33px; }.hero-lead { font-size: 15px; }.hero-visual { min-height: 350px; }.lambda-visual { min-height: 230px; }.lambda-visual img { width: 220px; height: 220px; }.lambda-visual span { font-size: 150px; }.section-heading { display: block; }.section-heading > p { margin-top: 16px; }.launcher-section, .how-section, .faq-section, .community-section { margin-top: 82px; }.quick-actions { grid-template-columns: 1fr; }.quick-action--play { min-height: 84px; }.launcher-menu { padding: 14px; }.launcher-menu__title { display: grid; gap: 6px; }.launcher-menu__title span { font-size: 30px; }.menu-button { display: grid; gap: 6px; min-height: 66px; }.menu-button small { line-height: 1.35; }.menu-panel { padding: 16px; }.menu-panel__header { align-items: center; }.menu-panel__close { font-size: 9px; }.launcher-sidebar { display: grid; grid-template-columns: 1fr; }.panel--source { grid-column: auto; }.options-grid, .steps { grid-template-columns: 1fr; }.option-block--network { padding: 20px 0 0; border-top: 1px solid var(--line); border-left: 0; }.launch-strip { display: block; }.button--launch { width: 100%; margin-top: 17px; }.faq-tools { display: block; }.faq-search { display: block; margin: 12px 0 0; }.faq-search input { width: 100%; }.section-heading--compact .text-button { margin-top: 15px; }.site-footer { grid-template-columns: 1fr; padding: 24px 17px 35px; }.footer-links { grid-column: auto; flex-wrap: wrap; }.footer-links a { padding-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
